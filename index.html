@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Forecast App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gradient-to-b from-blue-400 to-blue-700 min-h-screen text-white p-4">
+
+    <div class="max-w-xl mx-auto text-center">
+      <h1 class="text-4xl font-bold mb-4">Weather Forecast 🌦️</h1>
+
+      <!-- Search Section -->
+      <div class="flex flex-col sm:flex-row items-center gap-2 mb-4">
+        <input id="cityInput" type="text" placeholder="Enter city" class="px-4 py-2 text-black rounded w-full sm:w-auto" />
+        <button id="searchBtn" class="bg-white text-blue-700 px-4 py-2 rounded hover:bg-gray-200">Search</button>
+        <button id="currentLocBtn" class="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-300">Use My Location</button>
+      </div>
+
+      <!-- Dropdown for recent cities -->
+      <div class="mb-4">
+        <select id="recentCities" class="text-black px-4 py-2 rounded hidden"></select>
+      </div>
+
+      <!-- Weather Display Section -->
+      <div id="weatherInfo" class="bg-white bg-opacity-10 p-4 rounded shadow-md"></div>
+
+      <!-- 5-Day Forecast -->
+      <h2 class="text-2xl font-semibold mt-8 mb-4">5-Day Forecast</h2>
+      <div id="forecast" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4"></div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
