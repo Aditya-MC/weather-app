@@ -19,10 +19,10 @@ A responsive weather forecast web application built with **HTML**, **Tailwind CS
 - JavaScript
 - OpenWeatherMap API
 
-🌐 Live Demo
-Hosted via GitHub Pages: Click Here
+🌐 Live Demo : https://aditya-mc.github.io/weather-app/
 
-📦 API Used
+
+📦 API Used: 
 OpenWeatherMap
 
 Author
