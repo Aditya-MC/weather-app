@@ -1,36 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Weather Forecast App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-gradient-to-b from-blue-400 to-blue-700 min-h-screen text-white p-4">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Forecast App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body class="text-white p-6">
+  <div class="max-w-3xl mx-auto bg-white bg-opacity-10 backdrop-blur-md p-6 rounded-2xl shadow-xl">
+    
+    <h1 class="text-4xl font-bold text-center mb-6">🌦️ Weather Forecast</h1>
 
-    <div class="max-w-xl mx-auto text-center">
-      <h1 class="text-4xl font-bold mb-4">Weather Forecast 🌦️</h1>
-
-      <!-- Search Section -->
-      <div class="flex flex-col sm:flex-row items-center gap-2 mb-4">
-        <input id="cityInput" type="text" placeholder="Enter city" class="px-4 py-2 text-black rounded w-full sm:w-auto" />
-        <button id="searchBtn" class="bg-white text-blue-700 px-4 py-2 rounded hover:bg-gray-200">Search</button>
-        <button id="currentLocBtn" class="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-300">Use My Location</button>
-      </div>
-
-      <!-- Dropdown for recent cities -->
-      <div class="mb-4">
-        <select id="recentCities" class="text-black px-4 py-2 rounded hidden"></select>
-      </div>
-
-      <!-- Weather Display Section -->
-      <div id="weatherInfo" class="bg-white bg-opacity-10 p-4 rounded shadow-md"></div>
-
-      <!-- 5-Day Forecast -->
-      <h2 class="text-2xl font-semibold mt-8 mb-4">5-Day Forecast</h2>
-      <div id="forecast" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4"></div>
+    <!-- Search Bar -->
+    <div class="flex flex-col md:flex-row items-center gap-3 mb-6">
+      <input id="cityInput" type="text" placeholder="Enter city name..." class="flex-1 px-4 py-3 rounded-lg text-black placeholder-gray-600 focus:outline-none shadow-md" />
+      <button id="searchBtn" class="bg-yellow-400 hover:bg-yellow-300 text-black px-5 py-3 rounded-lg font-semibold shadow-md">Search</button>
+      <button id="currentLocBtn" class="bg-blue-600 hover:bg-blue-500 px-5 py-3 rounded-lg font-semibold shadow-md">🎯 My Location</button>
     </div>
 
-    <script src="script.js"></script>
-  </body>
+    <!-- Recent Dropdown -->
+    <div class="mb-6">
+      <select id="recentCities" class="text-black px-4 py-2 rounded-lg w-full hidden"></select>
+    </div>
+
+    <!-- Weather Info -->
+    <div id="weatherInfo" class="text-center bg-white bg-opacity-20 rounded-xl p-5 shadow-md mb-8 transition-all duration-300"></div>
+
+    <!-- 5 Day Forecast -->
+    <h2 class="text-2xl font-semibold mb-4 text-center">📅 5-Day Forecast</h2>
+    <div id="forecast" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
 </html>
