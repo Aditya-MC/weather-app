@@ -7,16 +7,18 @@ const recentCities = document.getElementById("recentCities");
 const currentLocBtn = document.getElementById("currentLocBtn");
 const forecastContainer = document.getElementById("forecast");
 
+// Input search
 searchBtn.addEventListener("click", () => {
   const city = cityInput.value.trim();
   if (city === "") {
-    alert("Enter a city name !");
+    showError("❗ Please enter a city name.");
     return;
   }
   fetchWeather(city);
   updateRecentCities(city);
 });
 
+// Dropdown change
 recentCities.addEventListener("change", () => {
   const selectedCity = recentCities.value;
   if (selectedCity) {
@@ -24,6 +26,19 @@ recentCities.addEventListener("change", () => {
   }
 });
 
+// Load dropdown on page load
+renderCityDropdown();
+
+// Geolocation
+currentLocBtn.addEventListener("click", () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, locationError);
+  } else {
+    showError("⚠️ Geolocation not supported by this browser.");
+  }
+});
+
+// Fetch current weather
 function fetchWeather(city) {
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
@@ -44,86 +59,15 @@ function fetchWeather(city) {
         <p>💨 Wind: ${wind.speed} m/s</p>
         <p>${weather[0].main} - ${weather[0].description}</p>
       `;
-      fetchForecast(name); // 👈 ONLY here
-    })
-    .catch(() => {
-      weatherInfo.innerHTML = `<p class="text-red-400">City not found or API error ⚠️</p>`;
-      forecastContainer.innerHTML = "";
-    });
-}
 
-function updateRecentCities(city) {
-  let cities = JSON.parse(localStorage.getItem("recentCities")) || [];
-
-  if (!cities.includes(city)) {
-    cities.unshift(city);
-    if (cities.length > 5) cities.pop();
-    localStorage.setItem("recentCities", JSON.stringify(cities));
-  }
-
-  renderCityDropdown();
-}
-
-function renderCityDropdown() {
-  let cities = JSON.parse(localStorage.getItem("recentCities")) || [];
-
-  if (cities.length > 0) {
-    recentCities.classList.remove("hidden");
-    recentCities.innerHTML = `<option value="">Recent Cities</option>`;
-    cities.forEach(city => {
-      recentCities.innerHTML += `<option value="${city}">${city}</option>`;
-    });
-  } else {
-    recentCities.classList.add("hidden");
-  }
-}
-
-// Load dropdown on page load
-renderCityDropdown();
-
-currentLocBtn.addEventListener("click", () => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(success, error);
-  } else {
-    alert("Geolocation is not supported by this browser.");
-  }
-});
-
-function success(position) {
-  const lat = position.coords.latitude;
-  const lon = position.coords.longitude;
-
-  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
-
-  fetch(url)
-    .then(res => {
-      if (!res.ok) throw new Error("Location fetch failed");
-      return res.json();
-    })
-    .then(data => {
-      const { name, main, wind, weather } = data;
-      const icon = `https://openweathermap.org/img/wn/${weather[0].icon}@2x.png`;
-
-      weatherInfo.innerHTML = `
-        <h3 class="text-xl font-semibold mb-2">${name}</h3>
-        <img src="${icon}" alt="${weather[0].description}" class="mx-auto">
-        <p>🌡️ Temp: ${main.temp}°C</p>
-        <p>💧 Humidity: ${main.humidity}%</p>
-        <p>💨 Wind: ${wind.speed} m/s</p>
-        <p>${weather[0].main} - ${weather[0].description}</p>
-      `;
       fetchForecast(name);
     })
     .catch(() => {
-      weatherInfo.innerHTML = `<p class="text-red-400">Could not fetch location weather ⚠️</p>`;
-      forecastContainer.innerHTML = "";
+      showError("❌ City not found or API error");
     });
 }
 
-function error() {
-  alert("Couldn't fetch location. Permission denied?");
-}
-
+// Fetch forecast
 function fetchForecast(city) {
   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
 
@@ -159,6 +103,79 @@ function fetchForecast(city) {
       forecastContainer.innerHTML = forecastHTML;
     })
     .catch(() => {
-      forecastContainer.innerHTML = `<p class="text-red-400">Error loading forecast ❌</p>`;
+      forecastContainer.innerHTML = `<p class="text-red-400 font-medium">❌ Error loading forecast</p>`;
     });
+}
+
+// Geolocation success
+function success(position) {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+
+  fetch(url)
+    .then(res => {
+      if (!res.ok) throw new Error("Location fetch failed");
+      return res.json();
+    })
+    .then(data => {
+      const { name, main, wind, weather } = data;
+      const icon = `https://openweathermap.org/img/wn/${weather[0].icon}@2x.png`;
+
+      weatherInfo.innerHTML = `
+        <h3 class="text-xl font-semibold mb-2">${name}</h3>
+        <img src="${icon}" alt="${weather[0].description}" class="mx-auto">
+        <p>🌡️ Temp: ${main.temp}°C</p>
+        <p>💧 Humidity: ${main.humidity}%</p>
+        <p>💨 Wind: ${wind.speed} m/s</p>
+        <p>${weather[0].main} - ${weather[0].description}</p>
+      `;
+      fetchForecast(name);
+    })
+    .catch(() => {
+      showError("❌ Could not fetch location weather");
+    });
+}
+
+function locationError() {
+  showError("⚠️ Location permission denied or not available.");
+}
+
+// Show error in UI
+function showError(message) {
+  weatherInfo.innerHTML = `<p class="text-red-400 font-medium">${message}</p>`;
+  forecastContainer.innerHTML = "";
+  setTimeout(() => {
+    if (weatherInfo.innerText.includes("❌") || weatherInfo.innerText.includes("⚠️") || weatherInfo.innerText.includes("❗")) {
+      weatherInfo.innerHTML = "";
+    }
+  }, 4000);
+}
+
+// Recent cities
+function updateRecentCities(city) {
+  let cities = JSON.parse(localStorage.getItem("recentCities")) || [];
+
+  if (!cities.includes(city)) {
+    cities.unshift(city);
+    if (cities.length > 5) cities.pop();
+    localStorage.setItem("recentCities", JSON.stringify(cities));
+  }
+
+  renderCityDropdown();
+}
+
+function renderCityDropdown() {
+  let cities = JSON.parse(localStorage.getItem("recentCities")) || [];
+
+  if (cities.length > 0) {
+    recentCities.classList.remove("hidden");
+    recentCities.innerHTML = `<option value="">Recent Cities</option>`;
+    cities.forEach(city => {
+      recentCities.innerHTML += `<option value="${city}">${city}</option>`;
+    });
+  } else {
+    recentCities.classList.add("hidden");
+  }
 }
