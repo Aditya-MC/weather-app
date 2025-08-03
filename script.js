@@ -5,11 +5,12 @@ const cityInput = document.getElementById("cityInput");
 const weatherInfo = document.getElementById("weatherInfo");
 const recentCities = document.getElementById("recentCities");
 const currentLocBtn = document.getElementById("currentLocBtn");
+const forecastContainer = document.getElementById("forecast");
 
 searchBtn.addEventListener("click", () => {
   const city = cityInput.value.trim();
   if (city === "") {
-    alert("Bruh, type a city name 😑");
+    alert("Enter a city name !");
     return;
   }
   fetchWeather(city);
@@ -43,9 +44,11 @@ function fetchWeather(city) {
         <p>💨 Wind: ${wind.speed} m/s</p>
         <p>${weather[0].main} - ${weather[0].description}</p>
       `;
+      fetchForecast(name); // 👈 ONLY here
     })
     .catch(() => {
       weatherInfo.innerHTML = `<p class="text-red-400">City not found or API error ⚠️</p>`;
+      forecastContainer.innerHTML = "";
     });
 }
 
@@ -53,8 +56,8 @@ function updateRecentCities(city) {
   let cities = JSON.parse(localStorage.getItem("recentCities")) || [];
 
   if (!cities.includes(city)) {
-    cities.unshift(city); // Add to start
-    if (cities.length > 5) cities.pop(); // Limit to 5
+    cities.unshift(city);
+    if (cities.length > 5) cities.pop();
     localStorage.setItem("recentCities", JSON.stringify(cities));
   }
 
@@ -77,8 +80,6 @@ function renderCityDropdown() {
 
 // Load dropdown on page load
 renderCityDropdown();
-
-
 
 currentLocBtn.addEventListener("click", () => {
   if (navigator.geolocation) {
@@ -111,12 +112,53 @@ function success(position) {
         <p>💨 Wind: ${wind.speed} m/s</p>
         <p>${weather[0].main} - ${weather[0].description}</p>
       `;
+      fetchForecast(name);
     })
     .catch(() => {
       weatherInfo.innerHTML = `<p class="text-red-400">Could not fetch location weather ⚠️</p>`;
+      forecastContainer.innerHTML = "";
     });
 }
 
 function error() {
   alert("Couldn't fetch location. Permission denied?");
+}
+
+function fetchForecast(city) {
+  const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
+
+  fetch(url)
+    .then(res => {
+      if (!res.ok) throw new Error("Forecast fetch failed");
+      return res.json();
+    })
+    .then(data => {
+      const forecastList = data.list;
+      const dailyForecasts = {};
+
+      forecastList.forEach(item => {
+        const [date, time] = item.dt_txt.split(" ");
+        if (time === "12:00:00" && !dailyForecasts[date]) {
+          dailyForecasts[date] = item;
+        }
+      });
+
+      const forecastHTML = Object.entries(dailyForecasts).slice(0, 5).map(([date, item]) => {
+        const icon = `https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`;
+        return `
+          <div class="bg-white bg-opacity-10 p-3 rounded shadow-md text-center">
+            <p class="font-semibold mb-1">${date}</p>
+            <img src="${icon}" alt="${item.weather[0].description}" class="mx-auto w-12 h-12">
+            <p>🌡️ ${item.main.temp}°C</p>
+            <p>💨 ${item.wind.speed} m/s</p>
+            <p>💧 ${item.main.humidity}%</p>
+          </div>
+        `;
+      }).join("");
+
+      forecastContainer.innerHTML = forecastHTML;
+    })
+    .catch(() => {
+      forecastContainer.innerHTML = `<p class="text-red-400">Error loading forecast ❌</p>`;
+    });
 }
